@@ -52,8 +52,8 @@ export default function LandingPage() {
             <Link href="/onboarding">
               <Button variant="ghost" size="sm">List your startup</Button>
             </Link>
-            <Link href="/dashboard">
-              <Button size="sm">Investor Login</Button>
+            <Link href="/login">
+              <Button size="sm">Login</Button>
             </Link>
           </div>
         </div>
@@ -174,7 +174,7 @@ export default function LandingPage() {
           <div className="flex items-center gap-6">
             <Link href="/pricing" className="text-xs text-gray-400 hover:text-gray-600">Pricing</Link>
             <Link href="/onboarding" className="text-xs text-gray-400 hover:text-gray-600">List a Startup</Link>
-            <Link href="/dashboard" className="text-xs text-gray-400 hover:text-gray-600">Dashboard</Link>
+            <Link href="/login" className="text-xs text-gray-400 hover:text-gray-600">Login</Link>
           </div>
           <p className="text-xs text-gray-400">© 2025 InvestTable. All rights reserved. EU GDPR compliant.</p>
         </div>

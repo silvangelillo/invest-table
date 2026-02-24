@@ -29,6 +29,7 @@ interface Plan {
   borderColor: string;
   bgColor: string;
   features: PlanFeature[];
+  isInvestor?: boolean;
 }
 
 // ─── Discount helpers ─────────────────────────────────────────────────────────
@@ -58,11 +59,12 @@ const INVESTOR_PLANS: Plan[] = [
     price: 0,
     unit: "free",
     cta: "Start free",
-    ctaHref: "/onboarding",
-    yearlyCtaHref: "/onboarding",
+    ctaHref: "/login",
+    yearlyCtaHref: "/login",
     color: "text-gray-700",
     borderColor: "border-gray-200",
     bgColor: "bg-gray-50",
+    isInvestor: true,
     features: [
       { text: "Browse all startups on map", included: true },
       { text: "Basic filters (category + stage)", included: true },
@@ -91,6 +93,7 @@ const INVESTOR_PLANS: Plan[] = [
     color: "text-blue-700",
     borderColor: "border-blue-400",
     bgColor: "bg-blue-600",
+    isInvestor: true,
     features: [
       { text: "Everything in Core", included: true },
       { text: "Alerts for new matching startups", included: true },
@@ -118,6 +121,7 @@ const INVESTOR_PLANS: Plan[] = [
     color: "text-indigo-700",
     borderColor: "border-indigo-300",
     bgColor: "bg-indigo-600",
+    isInvestor: true,
     features: [
       { text: "Everything in Plus", included: true },
       { text: "Unlimited saved searches", included: true },
@@ -257,24 +261,31 @@ function PricingCard({
   showTotal?: boolean;
 }) {
   const basePrice = billing === "yearly" && plan.yearlyPrice ? plan.yearlyPrice : plan.price;
-  const discountedPrice = seatDiscount && seatDiscount > 0 && plan.price > 0
-    ? Math.round(basePrice * (1 - seatDiscount / 100) * 100) / 100
-    : basePrice;
-  const href = billing === "yearly" && plan.yearlyCtaHref ? plan.yearlyCtaHref : plan.ctaHref;
+  const discountedPrice =
+    seatDiscount && seatDiscount > 0 && plan.price > 0
+      ? Math.round(basePrice * (1 - seatDiscount / 100) * 100) / 100
+      : basePrice;
+
+  const href =
+    billing === "yearly" && plan.yearlyCtaHref ? plan.yearlyCtaHref : plan.ctaHref;
+
   const isRec = plan.recommended;
 
-  const totalMonthly = showTotal && seats && plan.price > 0
-    ? Math.round(discountedPrice * seats * 100) / 100
-    : null;
+  const totalMonthly =
+    showTotal && seats && plan.price > 0
+      ? Math.round(discountedPrice * seats * 100) / 100
+      : null;
 
   return (
-    <div className={cn(
-      "relative flex flex-col rounded-3xl border-2 transition-all duration-300",
-      isRec
-        ? `${plan.bgColor} ${plan.borderColor} shadow-2xl scale-105 z-10`
-        : `bg-white ${plan.borderColor} shadow-md hover:shadow-lg hover:-translate-y-0.5 z-0`
-    )} style={{ minHeight: 560 }}>
-
+    <div
+      className={cn(
+        "relative flex flex-col rounded-3xl border-2 transition-all duration-300",
+        isRec
+          ? `${plan.bgColor} ${plan.borderColor} shadow-2xl scale-105 z-10`
+          : `bg-white ${plan.borderColor} shadow-md hover:shadow-lg hover:-translate-y-0.5 z-0`
+      )}
+      style={{ minHeight: 560 }}
+    >
       {plan.badge && (
         <div className={cn(
           "absolute -top-3.5 left-1/2 -translate-x-1/2 px-4 py-1 rounded-full text-[11px] font-bold tracking-wide whitespace-nowrap",
@@ -326,23 +337,25 @@ function PricingCard({
               or €{plan.yearlyPrice}/mo billed yearly
             </p>
           )}
-          {/* Total */}
           {totalMonthly !== null && (
             <p className={cn("text-xs font-semibold mt-2", isRec ? "text-white/80" : "text-gray-600")}>
-              Total: €{totalMonthly}/mo for {seats} seats
+              Total: €{totalMonthly}/mo for {seats} seat{seats !== 1 ? "s" : ""}
             </p>
           )}
         </div>
 
         {/* CTA */}
-        <Link href={href} className={cn(
-          "flex items-center justify-center gap-2 w-full py-2.5 rounded-2xl text-sm font-semibold transition-all duration-200 mb-5",
-          isRec
-            ? "bg-white text-blue-700 hover:bg-blue-50 shadow-md"
-            : plan.price === 0
+        <Link
+          href={href}
+          className={cn(
+            "flex items-center justify-center gap-2 w-full py-2.5 rounded-2xl text-sm font-semibold transition-all duration-200 mb-5",
+            isRec
+              ? "bg-white text-blue-700 hover:bg-blue-50 shadow-md"
+              : plan.price === 0
               ? "bg-gray-100 text-gray-700 hover:bg-gray-200"
               : `${plan.bgColor} text-white hover:opacity-90 shadow-sm`
-        )}>
+          )}
+        >
           {plan.cta}
           <ChevronRight className="w-3.5 h-3.5" />
         </Link>
@@ -365,29 +378,31 @@ function SeatSlider({ seats, onChange }: { seats: number; onChange: (n: number) 
   const hint = getNextDiscountHint(seats);
 
   return (
-    <div className="bg-white border border-gray-200 rounded-2xl p-5 mb-8 max-w-xl mx-auto shadow-sm">
-      <div className="flex items-center justify-between mb-3">
-        <span className="text-sm font-semibold text-gray-700">Team size</span>
-        <div className="flex items-center gap-3">
+    <div className="flex flex-col gap-2 mb-8 max-w-xl mx-auto">
+      <div className="flex items-center justify-between">
+        <span className="text-xs font-medium text-gray-500">Team size</span>
+        <div className="flex items-center gap-2">
           <button
             onClick={() => onChange(Math.max(1, seats - 1))}
-            className="w-7 h-7 rounded-full bg-gray-100 hover:bg-gray-200 flex items-center justify-center transition-colors"
+            className="w-5 h-5 rounded-full bg-gray-100 hover:bg-gray-200 flex items-center justify-center transition-colors"
           >
-            <Minus className="w-3 h-3 text-gray-600" />
+            <Minus className="w-2.5 h-2.5 text-gray-500" />
           </button>
-          <span className="text-lg font-black text-gray-900 w-12 text-center">{seats} {seats === 1 ? "seat" : "seats"}</span>
+          <span className="text-sm font-bold text-gray-900 w-16 text-center">
+            {seats} {seats === 1 ? "seat" : "seats"}
+          </span>
           <button
             onClick={() => onChange(Math.min(100, seats + 1))}
-            className="w-7 h-7 rounded-full bg-gray-100 hover:bg-gray-200 flex items-center justify-center transition-colors"
+            className="w-5 h-5 rounded-full bg-gray-100 hover:bg-gray-200 flex items-center justify-center transition-colors"
           >
-            <Plus className="w-3 h-3 text-gray-600" />
+            <Plus className="w-2.5 h-2.5 text-gray-500" />
           </button>
+          {pct > 0 && (
+            <span className="text-[11px] font-semibold text-emerald-600 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded-full ml-1">
+              {label}
+            </span>
+          )}
         </div>
-        {pct > 0 && (
-          <span className="text-xs font-bold text-emerald-600 bg-emerald-50 border border-emerald-200 px-2.5 py-1 rounded-full">
-            {label}
-          </span>
-        )}
       </div>
 
       <input
@@ -396,10 +411,10 @@ function SeatSlider({ seats, onChange }: { seats: number; onChange: (n: number) 
         max={100}
         value={seats}
         onChange={(e) => onChange(Number(e.target.value))}
-        className="w-full h-2 rounded-full accent-blue-600 cursor-pointer"
+        className="w-full h-1.5 rounded-full accent-blue-600 cursor-pointer"
       />
 
-      <div className="flex justify-between text-[10px] text-gray-400 mt-1">
+      <div className="flex justify-between text-[10px] text-gray-300">
         <span>1</span>
         <span>25</span>
         <span>50</span>
@@ -408,7 +423,7 @@ function SeatSlider({ seats, onChange }: { seats: number; onChange: (n: number) 
       </div>
 
       {hint && (
-        <p className="text-xs text-blue-600 font-medium mt-3 text-center">
+        <p className="text-[11px] text-blue-500 text-center mt-0.5">
           💡 {hint}
         </p>
       )}
@@ -505,8 +520,7 @@ export function PricingPage() {
           </div>
 
           <p className="text-center text-xs text-gray-400 mt-6">
-            Seats are per organization. Admin manages who has access.
-            Core is always single-user only.
+            Seats are per organization. Admin manages who has access. Core is always single-user only.
           </p>
         </section>
 
@@ -528,7 +542,7 @@ export function PricingPage() {
           <FairnessNote />
         </section>
 
-        {/* ── FAQ / POSITIONING ──────────────────────────────────────────── */}
+        {/* ── FAQ ──────────────────────────────────────────────────────────── */}
         <section className="grid grid-cols-2 gap-8 max-w-3xl mx-auto">
           {[
             {

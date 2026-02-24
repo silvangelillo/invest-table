@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Check, Zap, Star, Building2, Users, TrendingUp, ChevronRight, Shield } from "lucide-react";
+import { Check, ChevronRight, Shield, Building2, TrendingUp, Minus, Plus } from "lucide-react";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
 
@@ -24,10 +24,30 @@ interface Plan {
   recommended?: boolean;
   cta: string;
   ctaHref: string;
+  yearlyCtaHref?: string;
   color: string;
   borderColor: string;
   bgColor: string;
   features: PlanFeature[];
+}
+
+// ─── Discount helpers ─────────────────────────────────────────────────────────
+function getSeatDiscount(seats: number): { pct: number; label: string } {
+  if (seats >= 25) return { pct: 15, label: "15% off" };
+  if (seats >= 10) return { pct: 10, label: "10% off" };
+  return { pct: 0, label: "" };
+}
+
+function getNextDiscountHint(seats: number): string | null {
+  if (seats < 10) {
+    const needed = 10 - seats;
+    return `Add ${needed} more seat${needed > 1 ? "s" : ""} to get 10% off`;
+  }
+  if (seats < 25) {
+    const needed = 25 - seats;
+    return `Add ${needed} more seat${needed > 1 ? "s" : ""} to get 15% off`;
+  }
+  return null;
 }
 
 // ─── Investor Plans ───────────────────────────────────────────────────────────
@@ -39,6 +59,7 @@ const INVESTOR_PLANS: Plan[] = [
     unit: "free",
     cta: "Start free",
     ctaHref: "/onboarding",
+    yearlyCtaHref: "/onboarding",
     color: "text-gray-700",
     borderColor: "border-gray-200",
     bgColor: "bg-gray-50",
@@ -65,7 +86,8 @@ const INVESTOR_PLANS: Plan[] = [
     recommended: true,
     badge: "Most popular",
     cta: "Start scouting",
-    ctaHref: "/checkout?plan=investor-plus",
+    ctaHref: "/checkout?plan=investor-plus&interval=monthly",
+    yearlyCtaHref: "/checkout?plan=investor-plus&interval=yearly",
     color: "text-blue-700",
     borderColor: "border-blue-400",
     bgColor: "bg-blue-600",
@@ -91,7 +113,8 @@ const INVESTOR_PLANS: Plan[] = [
     unit: "seat / month",
     badge: "Deal teams",
     cta: "Equip your team",
-    ctaHref: "/checkout?plan=investor-pro",
+    ctaHref: "/checkout?plan=investor-pro&interval=monthly",
+    yearlyCtaHref: "/checkout?plan=investor-pro&interval=yearly",
     color: "text-indigo-700",
     borderColor: "border-indigo-300",
     bgColor: "bg-indigo-600",
@@ -118,6 +141,7 @@ const STARTUP_PLANS: Plan[] = [
     unit: "free forever",
     cta: "Get on the map",
     ctaHref: "/onboarding",
+    yearlyCtaHref: "/onboarding",
     color: "text-gray-700",
     borderColor: "border-gray-200",
     bgColor: "bg-gray-50",
@@ -143,7 +167,8 @@ const STARTUP_PLANS: Plan[] = [
     recommended: true,
     badge: "Recommended",
     cta: "Start raising",
-    ctaHref: "/checkout?plan=startup-plus",
+    ctaHref: "/checkout?plan=startup-plus&interval=monthly",
+    yearlyCtaHref: "/checkout?plan=startup-plus&interval=yearly",
     color: "text-blue-700",
     borderColor: "border-blue-400",
     bgColor: "bg-blue-600",
@@ -169,7 +194,8 @@ const STARTUP_PLANS: Plan[] = [
     unit: "/ month",
     badge: "Max exposure",
     cta: "Maximize exposure",
-    ctaHref: "/checkout?plan=startup-ultra",
+    ctaHref: "/checkout?plan=startup-ultra&interval=monthly",
+    yearlyCtaHref: "/checkout?plan=startup-ultra&interval=yearly",
     color: "text-purple-700",
     borderColor: "border-purple-300",
     bgColor: "bg-purple-600",
@@ -191,9 +217,7 @@ function FeatureRow({ feature, recommended }: { feature: PlanFeature; recommende
     <li className="flex items-start gap-2.5 py-1">
       <span className={cn(
         "mt-0.5 flex-shrink-0 w-4 h-4 rounded-full flex items-center justify-center",
-        feature.included
-          ? recommended ? "bg-white/20" : "bg-gray-100"
-          : "bg-transparent"
+        feature.included ? recommended ? "bg-white/20" : "bg-gray-100" : "bg-transparent"
       )}>
         {feature.included ? (
           <Check className={cn("w-2.5 h-2.5", recommended ? "text-white" : "text-emerald-500")} />
@@ -219,9 +243,29 @@ function FeatureRow({ feature, recommended }: { feature: PlanFeature; recommende
 }
 
 // ─── Pricing Card ─────────────────────────────────────────────────────────────
-function PricingCard({ plan, billing }: { plan: Plan; billing: BillingInterval }) {
-  const displayPrice = billing === "yearly" && plan.yearlyPrice ? plan.yearlyPrice : plan.price;
+function PricingCard({
+  plan,
+  billing,
+  seats,
+  seatDiscount,
+  showTotal,
+}: {
+  plan: Plan;
+  billing: BillingInterval;
+  seats?: number;
+  seatDiscount?: number;
+  showTotal?: boolean;
+}) {
+  const basePrice = billing === "yearly" && plan.yearlyPrice ? plan.yearlyPrice : plan.price;
+  const discountedPrice = seatDiscount && seatDiscount > 0 && plan.price > 0
+    ? Math.round(basePrice * (1 - seatDiscount / 100) * 100) / 100
+    : basePrice;
+  const href = billing === "yearly" && plan.yearlyCtaHref ? plan.yearlyCtaHref : plan.ctaHref;
   const isRec = plan.recommended;
+
+  const totalMonthly = showTotal && seats && plan.price > 0
+    ? Math.round(discountedPrice * seats * 100) / 100
+    : null;
 
   return (
     <div className={cn(
@@ -231,7 +275,6 @@ function PricingCard({ plan, billing }: { plan: Plan; billing: BillingInterval }
         : `bg-white ${plan.borderColor} shadow-md hover:shadow-lg hover:-translate-y-0.5 z-0`
     )} style={{ minHeight: 560 }}>
 
-      {/* Badge */}
       {plan.badge && (
         <div className={cn(
           "absolute -top-3.5 left-1/2 -translate-x-1/2 px-4 py-1 rounded-full text-[11px] font-bold tracking-wide whitespace-nowrap",
@@ -242,7 +285,6 @@ function PricingCard({ plan, billing }: { plan: Plan; billing: BillingInterval }
       )}
 
       <div className="p-6 flex flex-col flex-1">
-        {/* Plan name */}
         <div className="mb-4">
           <h3 className={cn("text-lg font-bold", isRec ? "text-white" : "text-gray-900")}>
             {plan.name}
@@ -255,9 +297,20 @@ function PricingCard({ plan, billing }: { plan: Plan; billing: BillingInterval }
             <div className={cn("text-4xl font-black", isRec ? "text-white" : "text-gray-900")}>Free</div>
           ) : (
             <div className="flex items-end gap-1.5">
-              <span className={cn("text-4xl font-black", isRec ? "text-white" : "text-gray-900")}>
-                €{displayPrice}
-              </span>
+              {seatDiscount && seatDiscount > 0 ? (
+                <div className="flex flex-col">
+                  <span className={cn("text-xs line-through opacity-50", isRec ? "text-white" : "text-gray-400")}>
+                    €{basePrice}
+                  </span>
+                  <span className={cn("text-4xl font-black", isRec ? "text-white" : "text-gray-900")}>
+                    €{discountedPrice}
+                  </span>
+                </div>
+              ) : (
+                <span className={cn("text-4xl font-black", isRec ? "text-white" : "text-gray-900")}>
+                  €{discountedPrice}
+                </span>
+              )}
               <span className={cn("text-sm pb-1.5", isRec ? "text-white/60" : "text-gray-400")}>
                 {plan.unit}
               </span>
@@ -273,10 +326,16 @@ function PricingCard({ plan, billing }: { plan: Plan; billing: BillingInterval }
               or €{plan.yearlyPrice}/mo billed yearly
             </p>
           )}
+          {/* Total */}
+          {totalMonthly !== null && (
+            <p className={cn("text-xs font-semibold mt-2", isRec ? "text-white/80" : "text-gray-600")}>
+              Total: €{totalMonthly}/mo for {seats} seats
+            </p>
+          )}
         </div>
 
         {/* CTA */}
-        <Link href={plan.ctaHref} className={cn(
+        <Link href={href} className={cn(
           "flex items-center justify-center gap-2 w-full py-2.5 rounded-2xl text-sm font-semibold transition-all duration-200 mb-5",
           isRec
             ? "bg-white text-blue-700 hover:bg-blue-50 shadow-md"
@@ -288,16 +347,71 @@ function PricingCard({ plan, billing }: { plan: Plan; billing: BillingInterval }
           <ChevronRight className="w-3.5 h-3.5" />
         </Link>
 
-        {/* Divider */}
         <div className={cn("w-full h-px mb-4", isRec ? "bg-white/20" : "bg-gray-100")} />
 
-        {/* Features */}
         <ul className="space-y-0.5 flex-1">
           {plan.features.map((f, i) => (
             <FeatureRow key={i} feature={f} recommended={isRec} />
           ))}
         </ul>
       </div>
+    </div>
+  );
+}
+
+// ─── Seat Slider ──────────────────────────────────────────────────────────────
+function SeatSlider({ seats, onChange }: { seats: number; onChange: (n: number) => void }) {
+  const { pct, label } = getSeatDiscount(seats);
+  const hint = getNextDiscountHint(seats);
+
+  return (
+    <div className="bg-white border border-gray-200 rounded-2xl p-5 mb-8 max-w-xl mx-auto shadow-sm">
+      <div className="flex items-center justify-between mb-3">
+        <span className="text-sm font-semibold text-gray-700">Team size</span>
+        <div className="flex items-center gap-3">
+          <button
+            onClick={() => onChange(Math.max(1, seats - 1))}
+            className="w-7 h-7 rounded-full bg-gray-100 hover:bg-gray-200 flex items-center justify-center transition-colors"
+          >
+            <Minus className="w-3 h-3 text-gray-600" />
+          </button>
+          <span className="text-lg font-black text-gray-900 w-12 text-center">{seats} {seats === 1 ? "seat" : "seats"}</span>
+          <button
+            onClick={() => onChange(Math.min(100, seats + 1))}
+            className="w-7 h-7 rounded-full bg-gray-100 hover:bg-gray-200 flex items-center justify-center transition-colors"
+          >
+            <Plus className="w-3 h-3 text-gray-600" />
+          </button>
+        </div>
+        {pct > 0 && (
+          <span className="text-xs font-bold text-emerald-600 bg-emerald-50 border border-emerald-200 px-2.5 py-1 rounded-full">
+            {label}
+          </span>
+        )}
+      </div>
+
+      <input
+        type="range"
+        min={1}
+        max={100}
+        value={seats}
+        onChange={(e) => onChange(Number(e.target.value))}
+        className="w-full h-2 rounded-full accent-blue-600 cursor-pointer"
+      />
+
+      <div className="flex justify-between text-[10px] text-gray-400 mt-1">
+        <span>1</span>
+        <span>25</span>
+        <span>50</span>
+        <span>75</span>
+        <span>100</span>
+      </div>
+
+      {hint && (
+        <p className="text-xs text-blue-600 font-medium mt-3 text-center">
+          💡 {hint}
+        </p>
+      )}
     </div>
   );
 }
@@ -334,6 +448,8 @@ function FairnessNote() {
 // ─── Main Page ────────────────────────────────────────────────────────────────
 export function PricingPage() {
   const [billing, setBilling] = useState<BillingInterval>("monthly");
+  const [seats, setSeats] = useState(1);
+  const { pct: seatDiscount } = getSeatDiscount(seats);
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
@@ -373,13 +489,21 @@ export function PricingPage() {
             color="text-blue-700 bg-blue-50 border-blue-200"
           />
 
+          <SeatSlider seats={seats} onChange={setSeats} />
+
           <div className="grid grid-cols-3 gap-0 items-end px-4">
             {INVESTOR_PLANS.map((plan) => (
-              <PricingCard key={plan.id} plan={plan} billing={billing} />
+              <PricingCard
+                key={plan.id}
+                plan={plan}
+                billing={billing}
+                seats={seats}
+                seatDiscount={seatDiscount}
+                showTotal={true}
+              />
             ))}
           </div>
 
-          {/* Seat note */}
           <p className="text-center text-xs text-gray-400 mt-6">
             Seats are per organization. Admin manages who has access.
             Core is always single-user only.

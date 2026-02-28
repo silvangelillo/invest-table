@@ -150,7 +150,7 @@ export default function LandingPage() {
         </div>
 
         {/* Stats */}
-        <div className="anim-fade mt-20 w-full max-w-2xl mx-auto">
+        <div className="anim-fade mt-20 w-full max-w-2xl mx-auto mb-16">
           <div className="glass rounded-3xl p-8">
             <div className="grid grid-cols-3 gap-8">
               {[
@@ -167,7 +167,7 @@ export default function LandingPage() {
           </div>
         </div>
 
-        <div className="anim-fade absolute bottom-10 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 opacity-30">
+        <div className="anim-fade flex flex-col items-center gap-2 opacity-30">
           <span className="text-[10px] text-white uppercase tracking-widest">Scroll</span>
           <div className="w-px h-8 bg-gradient-to-b from-white to-transparent" />
         </div>
@@ -337,4 +337,3 @@ export default function LandingPage() {
     </div>
   );
 }
-

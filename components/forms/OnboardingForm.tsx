@@ -1,11 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import {
   ChevronRight, ChevronLeft, Upload, MapPin, Shield, Check,
   Globe, Users, DollarSign, Sparkles, Building2, Zap
 } from "lucide-react";
-import { InvestMap } from "@/components/map/InvestMap";
 import { Toggle } from "@/components/ui/Toggle";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
@@ -138,6 +137,7 @@ const STEPS = [
 // ── Styles ────────────────────────────────────────────────────────────────────
 const STYLES = `
   @import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500&display=swap');
+  @import url('https://unpkg.com/leaflet@1.9.4/dist/leaflet.css');
   * { -webkit-font-smoothing: antialiased; }
 
   .dark-input {
@@ -299,6 +299,156 @@ function SectionTitle({ title, subtitle }: { title: string; subtitle?: string })
     <div className="mb-8">
       <h2 style={{fontFamily:"'DM Serif Display',serif", fontSize:'1.6rem', color:'rgba(255,255,255,0.9)', marginBottom:6}}>{title}</h2>
       {subtitle && <p style={{fontSize:13, color:'rgba(255,255,255,0.35)', fontWeight:300, fontFamily:"'DM Sans',sans-serif"}}>{subtitle}</p>}
+    </div>
+  );
+}
+
+// ── Location Step ──────────────────────────────────────────────────────────
+function LocationStep({ city, country, lat, lng, onCoords, onBack, onNext }: {
+  city: string; country: string;
+  lat: number | null; lng: number | null;
+  onCoords: (lat: number, lng: number) => void;
+  onBack: () => void; onNext: () => void;
+}) {
+  const [geocoding, setGeocoding] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const mapRef = useRef<any>(null);
+  const markerRef = useRef<any>(null);
+  const mapInitRef = useRef(false);
+
+  // Auto-geocode on mount
+  useEffect(() => {
+    if (lat && lng) {
+      initMap(lat, lng);
+      return;
+    }
+    geocode();
+  }, []);
+
+  async function geocode() {
+    setGeocoding(true);
+    setError(null);
+    try {
+      const query = encodeURIComponent(`${city}, ${country}`);
+      const res = await fetch(`https://nominatim.openstreetmap.org/search?q=${query}&format=json&limit=1`, {
+        headers: { 'User-Agent': 'InvestTable/1.0' }
+      });
+      const data = await res.json();
+      if (data.length === 0) throw new Error("Location not found");
+      const { lat: la, lon: lo } = data[0];
+      onCoords(parseFloat(la), parseFloat(lo));
+      initMap(parseFloat(la), parseFloat(lo));
+    } catch {
+      setError("Could not geocode location. Please try again.");
+    } finally {
+      setGeocoding(false);
+    }
+  }
+
+  function initMap(la: number, lo: number) {
+    if (mapInitRef.current) {
+      // Just update marker + view
+      if (mapRef.current && markerRef.current) {
+        markerRef.current.setLatLng([la, lo]);
+        mapRef.current.setView([la, lo], 11);
+      }
+      return;
+    }
+    if (typeof window === 'undefined') return;
+    import('leaflet').then(L => {
+      if (mapInitRef.current) return;
+      mapInitRef.current = true;
+      const container = document.getElementById('location-map');
+      if (!container) return;
+
+      // Fix default icons
+      delete (L.Icon.Default.prototype as any)._getIconUrl;
+      L.Icon.Default.mergeOptions({
+        iconRetinaUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png',
+        iconUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png',
+        shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
+      });
+
+      const map = L.map(container, { zoomControl: true, attributionControl: false }).setView([la, lo], 11);
+      L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+        subdomains: 'abcd', maxZoom: 19,
+      }).addTo(map);
+
+      // Custom blue pin
+      const icon = L.divIcon({
+        className: '',
+        html: `<div style="width:16px;height:16px;border-radius:50%;background:#3b82f6;border:3px solid white;box-shadow:0 0 12px rgba(59,130,246,0.6)"></div>`,
+        iconSize: [16, 16], iconAnchor: [8, 8],
+      });
+      const marker = L.marker([la, lo], { icon }).addTo(map);
+
+      // Allow manual adjustment by clicking
+      map.on('click', (e: any) => {
+        marker.setLatLng(e.latlng);
+        onCoords(e.latlng.lat, e.latlng.lng);
+      });
+
+      mapRef.current = map;
+      markerRef.current = marker;
+    });
+  }
+
+  return (
+    <div className="fade-up space-y-5">
+      <SectionTitle
+        title="Confirm your location."
+        subtitle={`${city}, ${country} · Adjust the pin if needed`}
+      />
+
+      {/* Map container */}
+      <div className="relative rounded-2xl overflow-hidden"
+        style={{height: 360, border:'1px solid rgba(255,255,255,0.08)', background:'rgba(255,255,255,0.02)'}}>
+
+        {geocoding && (
+          <div className="absolute inset-0 flex flex-col items-center justify-center z-10"
+            style={{background:'rgba(6,6,8,0.85)', backdropFilter:'blur(8px)'}}>
+            <div className="w-8 h-8 rounded-full border-2 border-blue-500 border-t-transparent animate-spin mb-3" />
+            <p style={{fontSize:13,color:'rgba(255,255,255,0.5)'}}>Locating {city}…</p>
+          </div>
+        )}
+
+        {error && (
+          <div className="absolute inset-0 flex flex-col items-center justify-center z-10 gap-3"
+            style={{background:'rgba(6,6,8,0.9)'}}>
+            <p style={{fontSize:13,color:'rgba(239,68,68,0.8)'}}>{error}</p>
+            <button className="step-btn step-btn-secondary" onClick={geocode} style={{padding:'8px 20px',fontSize:12}}>
+              Try again
+            </button>
+          </div>
+        )}
+
+        <div id="location-map" style={{width:'100%',height:'100%'}} />
+      </div>
+
+      {lat != null && !geocoding && !error && (
+        <div className="flex items-center gap-3 p-4 rounded-2xl"
+          style={{background:'rgba(16,185,129,0.08)', border:'1px solid rgba(16,185,129,0.2)'}}>
+          <MapPin style={{width:15,height:15,color:'rgba(52,211,153,0.8)',flexShrink:0}} />
+          <span style={{fontSize:13,color:'rgba(52,211,153,0.9)',fontWeight:500}}>{city}, {country}</span>
+          <span style={{fontSize:11,color:'rgba(255,255,255,0.25)',marginLeft:'auto',fontFamily:'monospace'}}>
+            {lat.toFixed(4)}, {lng?.toFixed(4)}
+          </span>
+          <button onClick={geocode} style={{fontSize:11,color:'rgba(255,255,255,0.3)',marginLeft:8,cursor:'pointer'}}>
+            Re-geocode
+          </button>
+        </div>
+      )}
+
+      <div className="flex gap-3">
+        <button className="step-btn step-btn-secondary" onClick={onBack}>
+          <ChevronLeft style={{width:16,height:16}} /> Back
+        </button>
+        <button className="step-btn step-btn-primary flex-1"
+          onClick={onNext} disabled={!lat || geocoding}
+          style={{opacity: lat && !geocoding ? 1 : 0.4}}>
+          Next: Pitch Deck <ChevronRight style={{width:16,height:16}} />
+        </button>
+      </div>
     </div>
   );
 }
@@ -626,53 +776,15 @@ export function OnboardingForm() {
 
       {/* ── STEP 2: Location ─────────────────────────────────────────── */}
       {step === 2 && (
-        <div className="fade-up space-y-5">
-          <SectionTitle
-            title="Pin your location."
-            subtitle={`Click anywhere on the map to place your pin.${data.city ? ` · ${data.city}, ${data.country}` : ''}`}
-          />
-
-          <div className="rounded-2xl overflow-hidden" style={{border:'1px solid rgba(255,255,255,0.08)'}}>
-            <InvestMap
-              locationPickMode
-              onLocationPick={(lat, lng) => {
-                update({lat, lng});
-                toast.success(`📍 Pinned: ${lat.toFixed(4)}, ${lng.toFixed(4)}`);
-              }}
-              pickedLat={data.lat ?? undefined}
-              pickedLng={data.lng ?? undefined}
-              height="400px"
-              startups={[]}
-            />
-          </div>
-
-          {data.lat != null ? (
-            <div className="flex items-center gap-3 p-4 rounded-2xl"
-              style={{background:'rgba(16,185,129,0.1)', border:'1px solid rgba(16,185,129,0.2)'}}>
-              <MapPin style={{width:16,height:16,color:'rgba(52,211,153,0.8)',flexShrink:0}} />
-              <span style={{fontSize:13,color:'rgba(52,211,153,0.9)',fontWeight:500}}>{data.city}, {data.country}</span>
-              <span style={{fontSize:11,color:'rgba(255,255,255,0.3)',marginLeft:'auto',fontFamily:'monospace'}}>
-                {data.lat.toFixed(4)}, {data.lng?.toFixed(4)}
-              </span>
-            </div>
-          ) : (
-            <div className="flex items-center gap-3 p-4 rounded-2xl"
-              style={{background:'rgba(245,158,11,0.08)', border:'1px solid rgba(245,158,11,0.2)'}}>
-              <MapPin style={{width:16,height:16,color:'rgba(253,211,77,0.7)',flexShrink:0}} />
-              <span style={{fontSize:13,color:'rgba(253,211,77,0.7)'}}>Click the map to place your pin</span>
-            </div>
-          )}
-
-          <div className="flex gap-3">
-            <button className="step-btn step-btn-secondary" onClick={() => setStep(1)}>
-              <ChevronLeft style={{width:16,height:16}} /> Back
-            </button>
-            <button className="step-btn step-btn-primary flex-1"
-              onClick={goNext} disabled={!data.lat} style={{opacity: data.lat ? 1 : 0.4}}>
-              Next: Pitch Deck <ChevronRight style={{width:16,height:16}} />
-            </button>
-          </div>
-        </div>
+        <LocationStep
+          city={data.city}
+          country={data.country}
+          lat={data.lat}
+          lng={data.lng}
+          onCoords={(lat, lng) => update({lat, lng})}
+          onBack={() => setStep(1)}
+          onNext={goNext}
+        />
       )}
 
       {/* ── STEP 3: Pitch Deck ───────────────────────────────────────── */}

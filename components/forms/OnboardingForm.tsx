@@ -103,17 +103,43 @@ const EU_COUNTRIES = [
   "Slovenia","Spain","Sweden","Norway","Switzerland","United Kingdom",
 ];
 
+type BusinessModel = "saas" | "marketplace" | "consumer" | "hardware" | "services" | "other";
+
 interface FormData {
+  // Core
   name: string; tagline: string; short_description: string;
   email: string; website_url: string;
   primary_category: string; subcategories: string[];
   founded_year: number; team_size: number;
   funding_stage: typeof STAGES[number];
   pricing_tier: StartupPricingTier;
-  revenue_last_12m: string; revenue_cagr_3y: string;
   country: string; city: string; lat: number | null; lng: number | null;
   pitch_deck_file: File | null; pitch_deck_url: string | null;
   gdpr_compliant: boolean;
+  // Investor Intelligence
+  business_model: BusinessModel;
+  arr_mrr: string;
+  revenue_last_12m: string;
+  revenue_cagr_3y: string;
+  gross_margin: string;
+  ebitda_margin: string;
+  mom_growth: string;
+  nrr: string;
+  logo_churn: string;
+  ltv: string;
+  cac: string;
+  cac_payback: string;
+  conversion_rate: string;
+  burn_rate: string;
+  runway_months: string;
+  total_raised: string;
+  next_raise: string;
+  next_raise_timeline: string;
+  tam: string;
+  sam: string;
+  prior_exits: string;
+  largest_customer_pct: string;
+  has_patents: boolean;
 }
 
 const DEFAULT: FormData = {
@@ -121,9 +147,17 @@ const DEFAULT: FormData = {
   primary_category: "", subcategories: [],
   founded_year: new Date().getFullYear() - 2,
   team_size: 5, funding_stage: "Seed", pricing_tier: "core",
-  revenue_last_12m: "", revenue_cagr_3y: "",
   country: "", city: "", lat: null, lng: null,
   pitch_deck_file: null, pitch_deck_url: null, gdpr_compliant: false,
+  business_model: "saas",
+  arr_mrr: "", revenue_last_12m: "", revenue_cagr_3y: "",
+  gross_margin: "", ebitda_margin: "", mom_growth: "",
+  nrr: "", logo_churn: "",
+  ltv: "", cac: "", cac_payback: "", conversion_rate: "",
+  burn_rate: "", runway_months: "", total_raised: "",
+  next_raise: "", next_raise_timeline: "",
+  tam: "", sam: "",
+  prior_exits: "", largest_customer_pct: "", has_patents: false,
 };
 
 const STEPS = [
@@ -299,6 +333,215 @@ function SectionTitle({ title, subtitle }: { title: string; subtitle?: string })
     <div className="mb-8">
       <h2 style={{fontFamily:"'DM Serif Display',serif", fontSize:'1.6rem', color:'rgba(255,255,255,0.9)', marginBottom:6}}>{title}</h2>
       {subtitle && <p style={{fontSize:13, color:'rgba(255,255,255,0.35)', fontWeight:300, fontFamily:"'DM Sans',sans-serif"}}>{subtitle}</p>}
+    </div>
+  );
+}
+
+
+// ── Investor Metrics Block ────────────────────────────────────────────────
+const BM_OPTIONS: { id: BusinessModel; label: string; emoji: string }[] = [
+  { id: "saas",        label: "SaaS / Software",  emoji: "💻" },
+  { id: "marketplace", label: "Marketplace",       emoji: "🔄" },
+  { id: "consumer",    label: "Consumer / D2C",    emoji: "🛍️" },
+  { id: "hardware",    label: "Hardware / IoT",    emoji: "⚙️" },
+  { id: "services",    label: "Services",          emoji: "🤝" },
+  { id: "other",       label: "Other",             emoji: "🏗️" },
+];
+
+function Num({ label, value, onChange, placeholder, hint, prefix, suffix }: {
+  label: string; value: string; onChange: (v: string) => void;
+  placeholder?: string; hint?: string; prefix?: string; suffix?: string;
+}) {
+  return (
+    <div>
+      <label className="dark-label">{label}</label>
+      <div className="relative">
+        {prefix && (
+          <span style={{position:"absolute",left:14,top:"50%",transform:"translateY(-50%)",fontSize:13,color:"rgba(255,255,255,0.25)",pointerEvents:"none"}}>
+            {prefix}
+          </span>
+        )}
+        <input type="number" className="dark-input"
+          style={{paddingLeft: prefix ? 30 : 16, paddingRight: suffix ? 38 : 16}}
+          placeholder={placeholder ?? "—"}
+          value={value}
+          onChange={e => onChange(e.target.value)} />
+        {suffix && (
+          <span style={{position:"absolute",right:14,top:"50%",transform:"translateY(-50%)",fontSize:12,color:"rgba(255,255,255,0.25)",pointerEvents:"none"}}>
+            {suffix}
+          </span>
+        )}
+      </div>
+      {hint && <p style={{fontSize:10,color:"rgba(255,255,255,0.2)",marginTop:4,lineHeight:1.4}}>{hint}</p>}
+    </div>
+  );
+}
+
+function MetricGroup({ title, accent, children }: { title: string; accent: string; children: React.ReactNode }) {
+  return (
+    <div className="rounded-xl p-4 space-y-3"
+      style={{background:"rgba(255,255,255,0.02)", border:"1px solid rgba(255,255,255,0.06)"}}>
+      <p style={{fontSize:10,fontWeight:600,textTransform:"uppercase",letterSpacing:"0.1em",color:accent,marginBottom:2}}>{title}</p>
+      <div className="grid grid-cols-2 gap-3">{children}</div>
+    </div>
+  );
+}
+
+function FilledCount({ data }: { data: FormData }) {
+  const fields = [
+    data.arr_mrr, data.mom_growth, data.revenue_cagr_3y, data.gross_margin,
+    data.ebitda_margin, data.nrr, data.logo_churn, data.ltv, data.cac,
+    data.cac_payback, data.burn_rate, data.runway_months, data.total_raised,
+    data.next_raise, data.tam, data.sam,
+  ];
+  const filled = fields.filter(Boolean).length;
+  const pct = Math.round((filled / fields.length) * 100);
+  const color = pct >= 75 ? "rgba(52,211,153,0.8)" : pct >= 40 ? "rgba(253,211,77,0.8)" : "rgba(255,255,255,0.25)";
+  return (
+    <div className="text-right flex-shrink-0 ml-4">
+      <p style={{fontSize:18,fontWeight:600,color,lineHeight:1}}>{pct}%</p>
+      <p style={{fontSize:10,color:"rgba(255,255,255,0.2)",marginTop:2}}>profile filled</p>
+    </div>
+  );
+}
+
+function InvestorMetricsBlock({ data, update }: {
+  data: FormData; update: (p: Partial<FormData>) => void;
+}) {
+  const isSaaS = data.business_model === "saas";
+  const isMarket = data.business_model === "marketplace";
+  const ltvCacRatio = data.ltv && data.cac && Number(data.cac) > 0
+    ? Number(data.ltv) / Number(data.cac) : null;
+
+  return (
+    <div className="rounded-2xl overflow-hidden" style={{border:"1px solid rgba(255,255,255,0.09)"}}>
+      {/* Header */}
+      <div className="px-5 pt-5 pb-4" style={{background:"rgba(255,255,255,0.03)"}}>
+        <div className="flex items-start justify-between mb-4">
+          <div>
+            <p style={{fontSize:12,fontWeight:600,color:"rgba(255,255,255,0.7)",marginBottom:2}}>Investor Intelligence</p>
+            <p style={{fontSize:11,color:"rgba(255,255,255,0.25)",fontWeight:300}}>Optional · self-reported · dramatically increases investor interest</p>
+          </div>
+          <FilledCount data={data} />
+        </div>
+        <div>
+          <p style={{fontSize:10,color:"rgba(255,255,255,0.25)",textTransform:"uppercase",letterSpacing:"0.08em",marginBottom:8}}>Business model</p>
+          <div className="flex flex-wrap gap-2">
+            {BM_OPTIONS.map(opt => (
+              <button key={opt.id} type="button" onClick={() => update({business_model: opt.id})}
+                className="px-3 py-1.5 rounded-xl text-xs font-medium transition-all"
+                style={{
+                  background: data.business_model === opt.id ? "rgba(59,130,246,0.2)" : "rgba(255,255,255,0.04)",
+                  border: data.business_model === opt.id ? "1px solid rgba(59,130,246,0.4)" : "1px solid rgba(255,255,255,0.08)",
+                  color: data.business_model === opt.id ? "rgba(147,197,253,0.9)" : "rgba(255,255,255,0.4)",
+                }}>
+                {opt.emoji} {opt.label}
+              </button>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* Metrics */}
+      <div className="p-5 space-y-4">
+
+        <MetricGroup title="Revenue" accent="rgba(52,211,153,0.7)">
+          <Num label={isSaaS ? "ARR (€)" : "Annual Revenue (€)"}
+            value={data.arr_mrr} onChange={v => update({arr_mrr: v})}
+            prefix="€" placeholder="500000"
+            hint={isSaaS ? "Annual Recurring Revenue" : "Revenue last 12 months"} />
+          <Num label="MoM Growth (%)" value={data.mom_growth} onChange={v => update({mom_growth: v})}
+            suffix="%" placeholder="8" hint="Month-over-month revenue growth" />
+          <Num label="3Y CAGR (%)" value={data.revenue_cagr_3y} onChange={v => update({revenue_cagr_3y: v})}
+            suffix="%" placeholder="120" hint="Compound annual growth rate" />
+          <Num label="Gross Margin (%)" value={data.gross_margin} onChange={v => update({gross_margin: v})}
+            suffix="%" placeholder={isSaaS ? "75" : isMarket ? "60" : "40"}
+            hint={isSaaS ? "Benchmark: >70% for SaaS" : "Revenue minus COGS"} />
+          <Num label="EBITDA Margin (%)" value={data.ebitda_margin} onChange={v => update({ebitda_margin: v})}
+            suffix="%" placeholder="-15" hint="Negative = pre-profitability" />
+          {isSaaS && (
+            <Num label="Net Revenue Retention (%)" value={data.nrr} onChange={v => update({nrr: v})}
+              suffix="%" placeholder="110" hint=">100% = negative churn (gold standard)" />
+          )}
+        </MetricGroup>
+
+        {(isSaaS || isMarket) && (
+          <MetricGroup title="Retention & Churn" accent="rgba(147,197,253,0.7)">
+            <Num label="Annual Logo Churn (%)" value={data.logo_churn} onChange={v => update({logo_churn: v})}
+              suffix="%" placeholder="8" hint="% customers lost per year. <5% = excellent" />
+            {isSaaS && (
+              <Num label="Trial → Paid Conversion (%)" value={data.conversion_rate} onChange={v => update({conversion_rate: v})}
+                suffix="%" placeholder="5" hint="Benchmark: 2–5% freemium, 15–25% sales-led" />
+            )}
+            <Num label="Top Customer (% of ARR)" value={data.largest_customer_pct} onChange={v => update({largest_customer_pct: v})}
+              suffix="%" placeholder="12" hint=">40% = concentration risk flag" />
+          </MetricGroup>
+        )}
+
+        <MetricGroup title="Unit Economics" accent="rgba(253,211,77,0.7)">
+          <Num label="LTV (€)" value={data.ltv} onChange={v => update({ltv: v})}
+            prefix="€" placeholder="12000" hint="Customer Lifetime Value" />
+          <Num label="CAC (€)" value={data.cac} onChange={v => update({cac: v})}
+            prefix="€" placeholder="2400" hint="Customer Acquisition Cost" />
+          <Num label="CAC Payback (months)" value={data.cac_payback} onChange={v => update({cac_payback: v})}
+            suffix="mo" placeholder="12" hint="<12mo = good. <6mo = exceptional" />
+          {ltvCacRatio !== null && (
+            <div className="col-span-2 flex items-center gap-3 px-3 py-2.5 rounded-lg"
+              style={{background:"rgba(255,255,255,0.04)", border:"1px solid rgba(255,255,255,0.07)"}}>
+              <span style={{fontSize:11,color:"rgba(255,255,255,0.3)"}}>LTV:CAC ratio</span>
+              <span style={{fontSize:16,fontWeight:700,marginLeft:"auto",
+                color: ltvCacRatio >= 5 ? "rgba(52,211,153,0.9)" : ltvCacRatio >= 3 ? "rgba(253,211,77,0.9)" : "rgba(251,146,60,0.9)"}}>
+                {ltvCacRatio.toFixed(1)}x
+              </span>
+              <span style={{fontSize:10,color:"rgba(255,255,255,0.25)"}}>
+                {ltvCacRatio >= 5 ? "🟢 Excellent" : ltvCacRatio >= 3 ? "🟡 Good" : "🔴 Below 3x benchmark"}
+              </span>
+            </div>
+          )}
+        </MetricGroup>
+
+        <MetricGroup title="Capital & Runway" accent="rgba(196,181,254,0.7)">
+          <Num label="Monthly Burn (€)" value={data.burn_rate} onChange={v => update({burn_rate: v})}
+            prefix="€" placeholder="80000" hint="Net monthly cash burn" />
+          <Num label="Runway (months)" value={data.runway_months} onChange={v => update({runway_months: v})}
+            suffix="mo" placeholder="18" hint=">18 months = healthy for investors" />
+          <Num label="Total Raised (€)" value={data.total_raised} onChange={v => update({total_raised: v})}
+            prefix="€" placeholder="2000000" hint="All funding to date" />
+          <Num label="Next Round Target (€)" value={data.next_raise} onChange={v => update({next_raise: v})}
+            prefix="€" placeholder="5000000" hint="What you are raising next" />
+          <div className="col-span-2">
+            <label className="dark-label">Next raise timeline</label>
+            <input className="dark-input" placeholder="e.g. Q3 2025 · actively raising"
+              value={data.next_raise_timeline} onChange={e => update({next_raise_timeline: e.target.value})} />
+            <p style={{fontSize:10,color:"rgba(255,255,255,0.2)",marginTop:4}}>Investors filter by this to find live deals</p>
+          </div>
+        </MetricGroup>
+
+        <MetricGroup title="Market Opportunity" accent="rgba(103,232,249,0.7)">
+          <Num label="TAM (€)" value={data.tam} onChange={v => update({tam: v})}
+            prefix="€" placeholder="50000000000" hint="Total Addressable Market" />
+          <Num label="SAM (€)" value={data.sam} onChange={v => update({sam: v})}
+            prefix="€" placeholder="5000000000" hint="Your realistic serviceable slice" />
+        </MetricGroup>
+
+        <MetricGroup title="Trust Signals" accent="rgba(253,186,116,0.7)">
+          <Num label="Founder prior exits" value={data.prior_exits} onChange={v => update({prior_exits: v})}
+            placeholder="0" hint="# of successful exits across founding team" />
+          <div>
+            <label className="dark-label">Patents / IP</label>
+            <button type="button" onClick={() => update({has_patents: !data.has_patents})}
+              className="w-full px-4 py-3 rounded-xl text-sm font-medium text-left transition-all"
+              style={{
+                background: data.has_patents ? "rgba(16,185,129,0.12)" : "rgba(255,255,255,0.04)",
+                border: data.has_patents ? "1px solid rgba(16,185,129,0.3)" : "1px solid rgba(255,255,255,0.08)",
+                color: data.has_patents ? "rgba(52,211,153,0.9)" : "rgba(255,255,255,0.35)",
+              }}>
+              {data.has_patents ? "✓ Has patents / pending IP" : "No patents filed"}
+            </button>
+          </div>
+        </MetricGroup>
+
+      </div>
     </div>
   );
 }
@@ -625,28 +868,8 @@ export function OnboardingForm() {
               </DarkField>
             </div>
 
-            {/* Financials */}
-            <div className="rounded-2xl p-5 space-y-4"
-              style={{background:'rgba(255,255,255,0.03)', border:'1px solid rgba(255,255,255,0.07)'}}>
-              <p style={{fontSize:11,color:'rgba(255,255,255,0.3)',textTransform:'uppercase',letterSpacing:'0.08em',fontWeight:500}}>
-                Financials <span style={{fontWeight:300,textTransform:'none',color:'rgba(255,255,255,0.2)'}}>· optional · self-reported · increases visibility</span>
-              </p>
-              <div className="grid grid-cols-2 gap-4">
-                <DarkField label="Revenue last 12m (€)" error={errors.revenue_last_12m}>
-                  <div className="relative">
-                    <DollarSign style={{position:'absolute',left:14,top:'50%',transform:'translateY(-50%)',width:15,height:15,color:'rgba(255,255,255,0.2)'}} />
-                    <input type="number" className="dark-input" style={{paddingLeft:38}}
-                      min={0} placeholder="0" value={data.revenue_last_12m}
-                      onChange={e => update({revenue_last_12m: e.target.value})} />
-                  </div>
-                </DarkField>
-                <DarkField label="3Y Revenue CAGR (%)" error={errors.revenue_cagr_3y} hint="-100% to 300%">
-                  <input type="number" className="dark-input"
-                    min={-100} max={300} placeholder="e.g. 120"
-                    value={data.revenue_cagr_3y} onChange={e => update({revenue_cagr_3y: e.target.value})} />
-                </DarkField>
-              </div>
-            </div>
+            {/* ── Investor Intelligence Block ── */}
+            <InvestorMetricsBlock data={data} update={update} />
 
             {/* Tier */}
             <div>

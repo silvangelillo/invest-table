@@ -1,3 +1,5 @@
+"use client";
+
 import Link from "next/link";
 import { TrendingUp, ArrowLeft, Shield, BarChart3, Settings } from "lucide-react";
 

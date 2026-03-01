@@ -8,12 +8,14 @@ import {
   ArrowUpRight, Search, ChevronRight, Shield,
   Building2, Users, Plus, SlidersHorizontal,
 } from "lucide-react";
+import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
 import { InvestMap } from "@/components/map/InvestMap";
 import { HeartButton } from "@/components/ui/HeartButton";
 import { TierBadge } from "@/components/ui/TierBadge";
 import { CategoryBadge } from "@/components/ui/CategoryBadge";
 import { AdvancedFilters } from "@/components/dashboard/AdvancedFilters";
+import { NPSSurvey } from "@/components/ui/NPSSurvey";
 import { MOCK_STARTUPS } from "@/lib/mock-data";
 import { rankStartups } from "@/lib/ranking/engine";
 import { matchesFilters, formatCurrency } from "@/lib/utils";
@@ -364,6 +366,20 @@ function Sidebar({
           >
             <LogOut size={13} />
           </button>
+        </div>
+
+        {/* Legal link */}
+        <div style={{ paddingTop: 4 }}>
+          <Link href="/terms" style={{
+            display: "block", textAlign: "center",
+            fontSize: 10, color: TEXT3, textDecoration: "none",
+            transition: "color 0.15s",
+          }}
+            onMouseEnter={e => (e.currentTarget.style.color = TEXT2)}
+            onMouseLeave={e => (e.currentTarget.style.color = TEXT3)}
+          >
+            Terms of Service
+          </Link>
         </div>
       </div>
     </aside>
@@ -790,6 +806,9 @@ export default function DashboardPage() {
           )}
         </div>
       </main>
+
+      {/* NPS survey — floats bottom-right after 45s */}
+      <NPSSurvey variant="floating" />
     </div>
   );
 }

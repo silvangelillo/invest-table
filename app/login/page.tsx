@@ -180,7 +180,7 @@ export default function LoginPage() {
   return (
     <div
       className="min-h-screen text-white flex items-center justify-center px-4"
-      style={{ background: "#060608", fontFamily: "'DM Sans', sans-serif" }}
+      style={{ background: "#060608", fontFamily: "'DM Sans', sans-serif", padding: "88px 16px 40px" }}
     >
       <style>{STYLES}</style>
 
@@ -381,8 +381,12 @@ export default function LoginPage() {
 
         <p style={{ textAlign: "center", fontSize: 11, color: "rgba(255,255,255,0.18)", marginTop: 20 }}>
           By continuing you agree to our{" "}
+          <Link href="/terms" style={{ color: "rgba(255,255,255,0.35)", textDecoration: "none" }}>
+            Terms of Service
+          </Link>
+          {" "}and{" "}
           <Link href="/cookie-policy" style={{ color: "rgba(255,255,255,0.35)", textDecoration: "none" }}>
-            Terms & Privacy
+            Privacy Policy
           </Link>
         </p>
       </div>

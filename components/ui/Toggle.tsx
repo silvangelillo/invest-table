@@ -29,7 +29,7 @@ export function Toggle({ checked, onChange, label, disabled }: ToggleProps) {
           )}
         />
       </button>
-      {label && <span className="text-sm text-gray-700 font-medium">{label}</span>}
+      {label && <span className="text-sm font-medium" style={{color:'rgba(255,255,255,0.7)'}}>{label}</span>}
     </label>
   );
 }

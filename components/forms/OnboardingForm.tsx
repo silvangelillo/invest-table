@@ -116,6 +116,8 @@ interface FormData {
   country: string; city: string; lat: number | null; lng: number | null;
   pitch_deck_file: File | null; pitch_deck_url: string | null;
   gdpr_compliant: boolean;
+  soc2_compliant: boolean;
+  additional_certifications: string;
   // Investor Intelligence
   business_model: BusinessModel;
   arr_mrr: string;
@@ -149,6 +151,7 @@ const DEFAULT: FormData = {
   team_size: 5, funding_stage: "Seed", pricing_tier: "core",
   country: "", city: "", lat: null, lng: null,
   pitch_deck_file: null, pitch_deck_url: null, gdpr_compliant: false,
+  soc2_compliant: false, additional_certifications: "",
   business_model: "saas",
   arr_mrr: "", revenue_last_12m: "", revenue_cagr_3y: "",
   gross_margin: "", ebitda_margin: "", mom_growth: "",
@@ -1077,15 +1080,20 @@ export function OnboardingForm() {
             subtitle="Review your listing and confirm GDPR compliance."
           />
 
-          {/* GDPR */}
+          {/* GDPR — required */}
           <div className="p-5 rounded-2xl space-y-4"
             style={{background:'rgba(59,130,246,0.06)', border:'1px solid rgba(59,130,246,0.15)'}}>
             <div className="flex items-start gap-3">
               <Shield style={{width:18,height:18,color:'rgba(147,197,253,0.7)',marginTop:2,flexShrink:0}} />
-              <div>
-                <p style={{fontSize:13,fontWeight:500,color:'rgba(255,255,255,0.8)',marginBottom:4}}>
-                  GDPR Compliance Declaration
-                </p>
+              <div className="flex-1">
+                <div className="flex items-center gap-2" style={{marginBottom:4}}>
+                  <p style={{fontSize:13,fontWeight:500,color:'rgba(255,255,255,0.8)'}}>
+                    GDPR Compliance Declaration
+                  </p>
+                  <span style={{fontSize:10,fontWeight:600,color:'rgba(147,197,253,0.8)',background:'rgba(59,130,246,0.2)',border:'1px solid rgba(59,130,246,0.3)',borderRadius:4,padding:'1px 6px',letterSpacing:'0.05em'}}>
+                    REQUIRED
+                  </span>
+                </div>
                 <p style={{fontSize:12,color:'rgba(255,255,255,0.35)',fontWeight:300,lineHeight:1.6}}>
                   By enabling this, you confirm your startup complies with GDPR.
                   Your data will only be shared with verified investors on this platform.
@@ -1099,6 +1107,62 @@ export function OnboardingForm() {
                 label="I confirm GDPR compliance"
               />
             </div>
+          </div>
+
+          {/* SOC 2 — optional */}
+          <div className="p-5 rounded-2xl space-y-4"
+            style={{background:'rgba(168,85,247,0.05)', border:'1px solid rgba(168,85,247,0.15)'}}>
+            <div className="flex items-start gap-3">
+              <Shield style={{width:18,height:18,color:'rgba(216,180,254,0.7)',marginTop:2,flexShrink:0}} />
+              <div className="flex-1">
+                <div className="flex items-center gap-2" style={{marginBottom:4}}>
+                  <p style={{fontSize:13,fontWeight:500,color:'rgba(255,255,255,0.8)'}}>
+                    SOC 2 Compliance
+                  </p>
+                  <span style={{fontSize:10,fontWeight:600,color:'rgba(216,180,254,0.7)',background:'rgba(168,85,247,0.15)',border:'1px solid rgba(168,85,247,0.25)',borderRadius:4,padding:'1px 6px',letterSpacing:'0.05em'}}>
+                    OPTIONAL
+                  </span>
+                </div>
+                <p style={{fontSize:12,color:'rgba(255,255,255,0.35)',fontWeight:300,lineHeight:1.6}}>
+                  Indicate if your startup holds a SOC 2 Type I or Type II certification. This builds trust with enterprise investors.
+                </p>
+              </div>
+            </div>
+            <div style={{borderTop:'1px solid rgba(255,255,255,0.06)',paddingTop:16}}>
+              <Toggle
+                checked={data.soc2_compliant}
+                onChange={v => update({soc2_compliant: v})}
+                label="We hold SOC 2 certification"
+              />
+            </div>
+          </div>
+
+          {/* Additional certifications — open field */}
+          <div className="p-5 rounded-2xl space-y-3"
+            style={{background:'rgba(255,255,255,0.02)', border:'1px solid rgba(255,255,255,0.07)'}}>
+            <div className="flex items-start gap-3">
+              <Shield style={{width:18,height:18,color:'rgba(255,255,255,0.25)',marginTop:2,flexShrink:0}} />
+              <div className="flex-1">
+                <p style={{fontSize:13,fontWeight:500,color:'rgba(255,255,255,0.8)',marginBottom:4}}>
+                  Additional Certifications
+                </p>
+                <p style={{fontSize:12,color:'rgba(255,255,255,0.35)',fontWeight:300,lineHeight:1.6}}>
+                  List any other certifications, standards, or compliance frameworks your startup holds (e.g. ISO 27001, HIPAA, PCI-DSS, CE Mark).
+                </p>
+              </div>
+            </div>
+            <textarea
+              className="dark-textarea"
+              placeholder="e.g. ISO 27001, HIPAA, PCI-DSS, CE Mark, FedRAMP…"
+              maxLength={400}
+              rows={3}
+              value={data.additional_certifications}
+              onChange={e => update({additional_certifications: e.target.value})}
+              style={{marginTop:4}}
+            />
+            <p style={{fontSize:11,color:'rgba(255,255,255,0.2)',textAlign:'right'}}>
+              {data.additional_certifications.length}/400
+            </p>
           </div>
 
           {/* Summary */}

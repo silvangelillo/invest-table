@@ -140,6 +140,7 @@ begin
 end;
 $$ language plpgsql;
 
+drop trigger if exists favorites_heart_count on favorites;
 create trigger favorites_heart_count
   after insert or delete on favorites
   for each row execute function update_heart_count();
@@ -179,25 +180,31 @@ alter table notifications      enable row level security;
 alter table audit_logs         enable row level security;
 
 -- Profiles: users see only their own
+drop policy if exists "profiles: own" on profiles;
 create policy "profiles: own" on profiles
   for all using (auth.uid() = id);
 
 -- Startups: approved ones visible to all, own startup always visible
+drop policy if exists "startups: approved visible to all" on startups;
 create policy "startups: approved visible to all" on startups
   for select using (approved = true);
 
+drop policy if exists "startups: own startup always visible" on startups;
 create policy "startups: own startup always visible" on startups
   for all using (auth.uid() = profile_id);
 
 -- Saved searches: own only
+drop policy if exists "saved_searches: own" on saved_searches;
 create policy "saved_searches: own" on saved_searches
   for all using (auth.uid() = investor_id);
 
 -- Favorites: own only
+drop policy if exists "favorites: own" on favorites;
 create policy "favorites: own" on favorites
   for all using (auth.uid() = investor_id);
 
 -- Notifications: own only
+drop policy if exists "notifications: own" on notifications;
 create policy "notifications: own" on notifications
   for all using (auth.uid() = investor_id);
 
@@ -225,6 +232,7 @@ values (
 ) on conflict (id) do nothing;
 
 -- Storage RLS: startups can upload/update their own deck
+drop policy if exists "pitch-decks: startups upload own" on storage.objects;
 create policy "pitch-decks: startups upload own"
   on storage.objects for insert
   with check (
@@ -232,6 +240,7 @@ create policy "pitch-decks: startups upload own"
     auth.uid()::text = (storage.foldername(name))[1]
   );
 
+drop policy if exists "pitch-decks: startups read own" on storage.objects;
 create policy "pitch-decks: startups read own"
   on storage.objects for select
   using (
@@ -240,6 +249,7 @@ create policy "pitch-decks: startups read own"
   );
 
 -- Authenticated investors can read all pitch decks
+drop policy if exists "pitch-decks: investors read" on storage.objects;
 create policy "pitch-decks: investors read"
   on storage.objects for select
   using (

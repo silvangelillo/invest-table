@@ -15,6 +15,7 @@ create table if not exists profiles (
 );
 
 -- Auto-create profile on signup
+-- Uses EXCEPTION so a trigger failure never blocks auth.users insert
 create or replace function handle_new_user()
 returns trigger as $$
 begin
@@ -23,11 +24,19 @@ begin
     new.id,
     coalesce(new.raw_user_meta_data->>'role', 'investor'),
     coalesce(new.raw_user_meta_data->>'full_name', '')
-  );
+  )
+  on conflict (id) do nothing;
   return new;
+exception
+  when others then
+    -- Log the error but never block the auth transaction
+    raise warning 'handle_new_user failed for user %: %', new.id, sqlerrm;
+    return new;
 end;
-$$ language plpgsql security definer;
+$$ language plpgsql security definer set search_path = public;
 
+-- Drop and recreate trigger to avoid duplicate trigger errors
+drop trigger if exists on_auth_user_created on auth.users;
 create trigger on_auth_user_created
   after insert on auth.users
   for each row execute function handle_new_user();

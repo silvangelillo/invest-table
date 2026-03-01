@@ -202,17 +202,39 @@ export default function LandingPage() {
                   Filter by category, stage, revenue, and CAGR. Every dot is a deal waiting to happen.
                 </p>
               </div>
-              <div className="mt-8 h-36 rounded-2xl overflow-hidden relative flex items-center justify-center"
-                style={{background: 'linear-gradient(135deg, rgba(59,130,246,0.08), rgba(16,185,129,0.05))'}}>
-                <span className="text-xs text-white/15 uppercase tracking-widest">Live map preview</span>
+              <div className="mt-8 rounded-2xl overflow-hidden relative"
+                style={{height: 160, background: 'linear-gradient(160deg, rgba(10,18,40,0.9) 0%, rgba(5,12,28,0.95) 100%)', border: '1px solid rgba(59,130,246,0.12)'}}>
+                {/* Grid lines */}
+                <svg width="100%" height="100%" style={{position:'absolute',inset:0,opacity:0.18}}>
+                  {[20,40,60,80].map(p => <line key={`h${p}`} x1="0" y1={`${p}%`} x2="100%" y2={`${p}%`} stroke="#3b82f6" strokeWidth="0.5"/>)}
+                  {[15,30,45,60,75,90].map(p => <line key={`v${p}`} x1={`${p}%`} y1="0" x2={`${p}%`} y2="100%" stroke="#3b82f6" strokeWidth="0.5"/>)}
+                </svg>
+                {/* City dots with glows */}
                 {[
-                  {top:'30%',left:'28%'},{top:'45%',left:'52%'},{top:'25%',left:'60%'},
-                  {top:'55%',left:'38%'},{top:'40%',left:'72%'},{top:'60%',left:'65%'},
-                  {top:'35%',left:'42%'},{top:'50%',left:'25%'},
-                ].map((pos, i) => (
-                  <div key={i} className="absolute w-1.5 h-1.5 rounded-full"
-                    style={{top: pos.top, left: pos.left, background: i % 2 === 0 ? 'rgba(59,130,246,0.5)' : 'rgba(16,185,129,0.4)'}} />
+                  {top:'28%',left:'32%',city:'Berlin',  color:'#3b82f6', n:12},
+                  {top:'44%',left:'50%',city:'Paris',   color:'#10b981', n: 9},
+                  {top:'22%',left:'60%',city:'Warsaw',  color:'#3b82f6', n: 7},
+                  {top:'55%',left:'37%',city:'Madrid',  color:'#a855f7', n: 5},
+                  {top:'38%',left:'68%',city:'Vilnius', color:'#10b981', n: 4},
+                  {top:'18%',left:'44%',city:'Stockholm',color:'#3b82f6',n: 8},
+                  {top:'60%',left:'58%',city:'Rome',    color:'#f59e0b', n: 6},
+                  {top:'50%',left:'22%',city:'Lisbon',  color:'#10b981', n: 3},
+                ].map((dot, i) => (
+                  <div key={i} style={{position:'absolute', top: dot.top, left: dot.left, transform:'translate(-50%,-50%)', textAlign:'center'}}>
+                    {/* Outer glow */}
+                    <div style={{position:'absolute',top:'50%',left:'50%',transform:'translate(-50%,-50%)',width:20,height:20,borderRadius:'50%',background:`${dot.color}20`,pointerEvents:'none'}}/>
+                    {/* Dot */}
+                    <div style={{width:7,height:7,borderRadius:'50%',background:dot.color,boxShadow:`0 0 8px ${dot.color}`,margin:'0 auto'}}/>
+                    {/* Label */}
+                    <div style={{fontSize:8,color:'rgba(255,255,255,0.5)',marginTop:3,whiteSpace:'nowrap',fontFamily:'DM Sans,sans-serif'}}>{dot.city}</div>
+                    {/* Count */}
+                    <div style={{fontSize:7,color:dot.color,fontWeight:600,fontFamily:'DM Sans,sans-serif'}}>{dot.n}</div>
+                  </div>
                 ))}
+                {/* Label */}
+                <div style={{position:'absolute',bottom:8,right:12,fontSize:9,color:'rgba(255,255,255,0.2)',textTransform:'uppercase',letterSpacing:'0.1em',fontFamily:'DM Sans,sans-serif'}}>
+                  EU Startup Map
+                </div>
               </div>
             </div>
 
@@ -323,6 +345,7 @@ export default function LandingPage() {
               { href: "/pricing",      label: "Pricing" },
               { href: "/onboarding",   label: "List Startup" },
               { href: "/login",        label: "Sign in" },
+              { href: "/terms",        label: "Terms" },
               { href: "/cookie-policy",label: "Privacy" },
             ].map(({ href, label }) => (
               <Link key={href} href={href} className="text-xs text-white/25 hover:text-white/60 transition-colors tracking-widest uppercase">
@@ -330,7 +353,7 @@ export default function LandingPage() {
               </Link>
             ))}
           </div>
-          <p className="text-xs text-white/20">© 2025 InvestTable · EU GDPR compliant</p>
+          <p className="text-xs text-white/20">© {new Date().getFullYear()} InvestTable · EU GDPR compliant</p>
         </div>
       </footer>
 

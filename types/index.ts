@@ -1,10 +1,39 @@
 // ─── Categories ───────────────────────────────────────────────────────────────
-export type StartupCategory = "Tech" | "Food" | "Service" | "Sustainability";
+export type StartupCategory =
+  | "Technology"
+  | "Finance & FinTech"
+  | "Life Sciences & Health"
+  | "Climate & Energy"
+  | "Mobility & Logistics"
+  | "Food & Agriculture"
+  | "Deep Tech & Hardware"
+  | "Consumer & Media";
 
 export type StartupSecondaryCategory =
-  | "SaaS" | "DeepTech" | "AI" | "VR" | "AR"
-  | "ClimateTech" | "FinTech" | "HealthTech" | "Robotics"
-  | "Marketplace" | "B2B" | "B2C" | "Hardware" | "Biotech";
+  // Technology
+  | "SaaS" | "AI & Machine Learning" | "Cybersecurity" | "Developer Tools"
+  | "Cloud Infrastructure" | "AdTech" | "LegalTech" | "HRTech"
+  // Finance & FinTech
+  | "Payments & Banking" | "InsurTech" | "WealthTech" | "Crypto & Web3"
+  | "RegTech" | "Lending & Credit" | "B2B Finance"
+  // Life Sciences & Health
+  | "HealthTech" | "BioTech" | "MedTech" | "Pharma & Drug Discovery"
+  | "Mental Health" | "Digital Therapeutics" | "Genomics"
+  // Climate & Energy
+  | "CleanTech" | "Renewable Energy" | "Carbon & Offsetting" | "Circular Economy"
+  | "Sustainable Agriculture" | "Green Building" | "Water Tech"
+  // Mobility & Logistics
+  | "EV & Automotive" | "Urban Mobility" | "Freight & Supply Chain"
+  | "Last-Mile Delivery" | "Drones & Aviation" | "Smart Infrastructure"
+  // Food & Agriculture
+  | "FoodTech" | "AgriTech" | "Alternative Protein" | "Restaurant Tech"
+  | "Food Delivery" | "Vertical Farming" | "Aquaculture"
+  // Deep Tech & Hardware
+  | "Robotics" | "Quantum Computing" | "Semiconductors" | "Space Tech"
+  | "AR / VR / XR" | "Advanced Manufacturing" | "Photonics" | "Defense Tech"
+  // Consumer & Media
+  | "E-Commerce" | "Creator Economy" | "Gaming & Esports" | "EdTech"
+  | "Travel & Hospitality" | "Social & Community" | "PropTech" | "Fashion Tech";
 
 // ─── Pricing Tiers ────────────────────────────────────────────────────────────
 export type StartupPricingTier = "core" | "plus" | "ultra";

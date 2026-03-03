@@ -6,15 +6,19 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
-// Category styling config
+// Category styling config — all rgba for dark-theme compatibility
 export const CATEGORY_CONFIG: Record<
   StartupCategory,
-  { color: string; bg: string; border: string; dot: string; label: string }
+  { textColor: string; bgColor: string; borderColor: string; dotColor: string; label: string; emoji: string }
 > = {
-  Tech:           { color: "text-blue-600",    bg: "bg-blue-50",    border: "border-blue-200",    dot: "#3b82f6", label: "Tech"           },
-  Food:           { color: "text-orange-600",  bg: "bg-orange-50",  border: "border-orange-200",  dot: "#f97316", label: "Food"           },
-  Service:        { color: "text-purple-600",  bg: "bg-purple-50",  border: "border-purple-200",  dot: "#a855f7", label: "Service"        },
-  Sustainability: { color: "text-emerald-600", bg: "bg-emerald-50", border: "border-emerald-200", dot: "#10b981", label: "Sustainability" },
+  "Technology":             { textColor: "rgba(147,197,253,0.9)", bgColor: "rgba(59,130,246,0.12)",  borderColor: "rgba(59,130,246,0.25)",  dotColor: "#3b82f6", label: "Technology",             emoji: "💻" },
+  "Finance & FinTech":      { textColor: "rgba(52,211,153,0.9)",  bgColor: "rgba(16,185,129,0.12)",  borderColor: "rgba(16,185,129,0.25)",  dotColor: "#10b981", label: "Finance & FinTech",      emoji: "💳" },
+  "Life Sciences & Health": { textColor: "rgba(252,165,165,0.9)", bgColor: "rgba(239,68,68,0.12)",   borderColor: "rgba(239,68,68,0.25)",   dotColor: "#ef4444", label: "Life Sciences & Health", emoji: "🧬" },
+  "Climate & Energy":       { textColor: "rgba(134,239,172,0.9)", bgColor: "rgba(34,197,94,0.12)",   borderColor: "rgba(34,197,94,0.25)",   dotColor: "#22c55e", label: "Climate & Energy",       emoji: "🌱" },
+  "Mobility & Logistics":   { textColor: "rgba(253,211,77,0.9)",  bgColor: "rgba(245,158,11,0.12)",  borderColor: "rgba(245,158,11,0.25)",  dotColor: "#f59e0b", label: "Mobility & Logistics",   emoji: "🚗" },
+  "Food & Agriculture":     { textColor: "rgba(216,180,254,0.9)", bgColor: "rgba(168,85,247,0.12)",  borderColor: "rgba(168,85,247,0.25)",  dotColor: "#a855f7", label: "Food & Agriculture",     emoji: "🌾" },
+  "Deep Tech & Hardware":   { textColor: "rgba(103,232,249,0.9)", bgColor: "rgba(6,182,212,0.12)",   borderColor: "rgba(6,182,212,0.25)",   dotColor: "#06b6d4", label: "Deep Tech & Hardware",   emoji: "⚛️" },
+  "Consumer & Media":       { textColor: "rgba(253,186,116,0.9)", bgColor: "rgba(251,146,60,0.12)",  borderColor: "rgba(251,146,60,0.25)",  dotColor: "#fb923c", label: "Consumer & Media",       emoji: "🎯" },
 };
 
 // Extended filter matching (AND logic throughout)

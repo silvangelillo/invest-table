@@ -39,9 +39,9 @@ export function InvestMap({
   pickedLng,
   height = "600px",
 }: InvestMapProps) {
-  const [activeCategories, setActiveCategories] = useState<StartupCategory[]>([
-    "Tech", "Food", "Service", "Sustainability",
-  ]);
+  const [activeCategories, setActiveCategories] = useState<StartupCategory[]>(
+    Object.keys(CATEGORY_CONFIG) as StartupCategory[]
+  );
   const [selected, setSelected]   = useState<Startup | null>(null);
   const [isClient, setIsClient]   = useState(false);
 
@@ -65,8 +65,9 @@ export function InvestMap({
   );
 
   const counts = useMemo(() => {
-    const c = { Tech: 0, Food: 0, Service: 0, Sustainability: 0 } as Record<StartupCategory, number>;
-    startups.forEach((s) => c[s.category]++);
+    const c = {} as Record<StartupCategory, number>;
+    (Object.keys(CATEGORY_CONFIG) as StartupCategory[]).forEach(k => { c[k] = 0; });
+    startups.forEach((s) => { if (c[s.category] !== undefined) c[s.category]++; });
     return c;
   }, [startups]);
 
@@ -121,7 +122,7 @@ export function InvestMap({
                 radius={isSelected ? 10 : 7}
                 pathOptions={{
                   color: "white", weight: isSelected ? 3 : 2,
-                  fillColor: cfg.dot, fillOpacity: 1, opacity: 1,
+                  fillColor: cfg.dotColor, fillOpacity: 1, opacity: 1,
                 }}
                 eventHandlers={{ click: () => setSelected(isSelected ? null : startup) }}
               >
@@ -163,12 +164,12 @@ export function InvestMap({
         {!locationPickMode && (
           <div className="absolute bottom-4 right-4 z-[1000] bg-white/80 backdrop-blur-xl rounded-2xl border border-white/60 shadow-glass p-3">
             <p className="text-[10px] font-semibold text-gray-400 uppercase tracking-wider mb-2">Categories</p>
-            {(["Tech", "Food", "Service", "Sustainability"] as StartupCategory[]).map((cat) => {
+            {(Object.keys(CATEGORY_CONFIG) as StartupCategory[]).map((cat) => {
               const cfg = CATEGORY_CONFIG[cat];
               return (
                 <div key={cat} className="flex items-center gap-2 mb-1.5 last:mb-0">
-                  <span className="w-2.5 h-2.5 rounded-full border-2 border-white shadow-sm" style={{ backgroundColor: cfg.dot }} />
-                  <span className="text-xs text-gray-600">{cat}</span>
+                  <span className="w-2.5 h-2.5 rounded-full border-2 border-white shadow-sm" style={{ backgroundColor: cfg.dotColor }} />
+                  <span className="text-xs text-gray-600">{cfg.label}</span>
                 </div>
               );
             })}

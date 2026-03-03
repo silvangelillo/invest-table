@@ -4,7 +4,7 @@ export const MOCK_STARTUPS: Startup[] = [
   {
     id: "1", name: "NordAI", tagline: "AI-powered logistics for Nordic markets",
     short_description: "NordAI uses machine learning to optimize last-mile delivery for Nordic e-commerce, reducing carbon emissions by 30%.",
-    category: "Tech", secondary_categories: ["AI", "SaaS"],
+    category: "Technology", secondary_categories: ["AI & Machine Learning", "SaaS"],
     city: "Berlin", country: "Germany", lat: 52.52, lng: 13.405,
     pitch_deck_url: null, gdpr_compliant: true, founded_year: 2022,
     team_size: 12, employee_count: 12, funding_stage: "Seed",
@@ -17,7 +17,7 @@ export const MOCK_STARTUPS: Startup[] = [
   {
     id: "2", name: "GreenPlate", tagline: "Sustainable meal kits from local farms",
     short_description: "Farm-to-door meal kits sourced exclusively from certified organic farms within 100km of delivery.",
-    category: "Food", secondary_categories: ["Marketplace", "B2C"],
+    category: "Food & Agriculture", secondary_categories: ["FoodTech", "Alternative Protein"],
     city: "Amsterdam", country: "Netherlands", lat: 52.374, lng: 4.9,
     pitch_deck_url: null, gdpr_compliant: true, founded_year: 2021,
     team_size: 28, employee_count: 28, funding_stage: "Series A",
@@ -30,7 +30,7 @@ export const MOCK_STARTUPS: Startup[] = [
   {
     id: "3", name: "Karbono", tagline: "Carbon tracking for SMEs",
     short_description: "Simple carbon footprint tracking and reporting for small businesses, EU taxonomy aligned.",
-    category: "Sustainability", secondary_categories: ["ClimateTech", "SaaS", "B2B"],
+    category: "Climate & Energy", secondary_categories: ["Carbon & Offsetting", "SaaS"],
     city: "Paris", country: "France", lat: 48.857, lng: 2.347,
     pitch_deck_url: null, gdpr_compliant: true, founded_year: 2023,
     team_size: 6, employee_count: 6, funding_stage: "Pre-seed",
@@ -42,7 +42,7 @@ export const MOCK_STARTUPS: Startup[] = [
   {
     id: "4", name: "UrbanFlow", tagline: "On-demand urban mobility services",
     short_description: "Micro-mobility platform connecting commuters with e-scooters, bikes, and ride-sharing in European cities.",
-    category: "Service", secondary_categories: ["Marketplace", "B2C"],
+    category: "Mobility & Logistics", secondary_categories: ["Urban Mobility", "Last-Mile Delivery"],
     city: "Barcelona", country: "Spain", lat: 41.385, lng: 2.173,
     pitch_deck_url: null, gdpr_compliant: false, founded_year: 2022,
     team_size: 45, employee_count: 45, funding_stage: "Series A",
@@ -54,7 +54,7 @@ export const MOCK_STARTUPS: Startup[] = [
   {
     id: "5", name: "QuantumVault", tagline: "Post-quantum encryption for enterprises",
     short_description: "Enterprise-grade post-quantum cryptography SDK protecting sensitive data against future quantum attacks.",
-    category: "Tech", secondary_categories: ["DeepTech", "SaaS", "B2B"],
+    category: "Deep Tech & Hardware", secondary_categories: ["Quantum Computing", "Semiconductors"],
     city: "Stockholm", country: "Sweden", lat: 59.333, lng: 18.065,
     pitch_deck_url: null, gdpr_compliant: true, founded_year: 2023,
     team_size: 9, employee_count: 9, funding_stage: "Seed",
@@ -67,7 +67,7 @@ export const MOCK_STARTUPS: Startup[] = [
   {
     id: "6", name: "SoilSense", tagline: "IoT soil health monitoring platform",
     short_description: "Hardware+software platform giving farmers real-time soil health data via distributed IoT sensors.",
-    category: "Sustainability", secondary_categories: ["Hardware", "ClimateTech", "B2B"],
+    category: "Climate & Energy", secondary_categories: ["Sustainable Agriculture", "Water Tech"],
     city: "Warsaw", country: "Poland", lat: 52.23, lng: 21.01,
     pitch_deck_url: null, gdpr_compliant: true, founded_year: 2021,
     team_size: 18, employee_count: 18, funding_stage: "Seed",
@@ -79,7 +79,7 @@ export const MOCK_STARTUPS: Startup[] = [
   {
     id: "7", name: "FoodDAO", tagline: "Decentralized restaurant supply chain",
     short_description: "Blockchain-based cooperative connecting restaurants directly with local food producers, eliminating middlemen.",
-    category: "Food", secondary_categories: ["Marketplace", "B2B"],
+    category: "Food & Agriculture", secondary_categories: ["FoodTech", "AgriTech"],
     city: "Lisbon", country: "Portugal", lat: 38.717, lng: -9.139,
     pitch_deck_url: null, gdpr_compliant: true, founded_year: 2023,
     team_size: 7, employee_count: 7, funding_stage: "Pre-seed",
@@ -91,7 +91,7 @@ export const MOCK_STARTUPS: Startup[] = [
   {
     id: "8", name: "LegalEase", tagline: "Automated legal compliance for startups",
     short_description: "AI-powered legal compliance platform helping EU startups navigate GDPR, employment law, and corporate governance.",
-    category: "Service", secondary_categories: ["AI", "SaaS", "B2B"],
+    category: "Technology", secondary_categories: ["LegalTech", "AI & Machine Learning"],
     city: "Munich", country: "Germany", lat: 48.137, lng: 11.575,
     pitch_deck_url: null, gdpr_compliant: true, founded_year: 2022,
     team_size: 22, employee_count: 22, funding_stage: "Series A",
@@ -103,7 +103,7 @@ export const MOCK_STARTUPS: Startup[] = [
   {
     id: "9", name: "MindBridge", tagline: "Corporate mental health platform",
     short_description: "Evidence-based mental health support platform for teams, combining therapy access with preventive wellness tools.",
-    category: "Service", secondary_categories: ["HealthTech", "SaaS", "B2B"],
+    category: "Life Sciences & Health", secondary_categories: ["Mental Health", "Digital Therapeutics"],
     city: "Vienna", country: "Austria", lat: 48.208, lng: 16.373,
     pitch_deck_url: null, gdpr_compliant: true, founded_year: 2023,
     team_size: 14, employee_count: 14, funding_stage: "Seed",
@@ -115,7 +115,7 @@ export const MOCK_STARTUPS: Startup[] = [
   {
     id: "10", name: "CircleWave", tagline: "Circular economy marketplace for B2B",
     short_description: "Industrial waste-to-resource marketplace enabling manufacturers to buy and sell production byproducts.",
-    category: "Sustainability", secondary_categories: ["ClimateTech", "Marketplace", "B2B"],
+    category: "Climate & Energy", secondary_categories: ["Circular Economy", "CleanTech"],
     city: "Copenhagen", country: "Denmark", lat: 55.676, lng: 12.568,
     pitch_deck_url: null, gdpr_compliant: true, founded_year: 2021,
     team_size: 31, employee_count: 31, funding_stage: "Series B+",
@@ -131,13 +131,13 @@ export const MOCK_SAVED_SEARCHES: SavedSearch[] = [
   {
     id: "s1", investor_id: "demo-investor",
     label: "Tech in Berlin",
-    filters: { categories: ["Tech"], city: "Berlin" },
+    filters: { categories: ["Technology"], city: "Berlin" },
     alerts_enabled: true, created_at: "2024-06-01T10:00:00Z",
   },
   {
     id: "s2", investor_id: "demo-investor",
-    label: "Sustainability Startups",
-    filters: { categories: ["Sustainability"] },
+    label: "Climate Startups",
+    filters: { categories: ["Climate & Energy"] },
     alerts_enabled: false, created_at: "2024-06-10T10:00:00Z",
   },
 ];

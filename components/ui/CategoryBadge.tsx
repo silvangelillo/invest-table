@@ -1,4 +1,4 @@
-import { cn, CATEGORY_CONFIG } from "@/lib/utils";
+import { CATEGORY_CONFIG } from "@/lib/utils";
 import type { StartupCategory } from "@/types";
 
 interface CategoryBadgeProps {
@@ -9,21 +9,37 @@ interface CategoryBadgeProps {
 
 export function CategoryBadge({ category, size = "md", dot = true }: CategoryBadgeProps) {
   const cfg = CATEGORY_CONFIG[category];
+  if (!cfg) return null;
   return (
     <span
-      className={cn(
-        "inline-flex items-center gap-1.5 rounded-full font-medium border",
-        cfg.color, cfg.bg, cfg.border,
-        size === "sm" ? "px-2 py-0.5 text-xs" : "px-3 py-1 text-xs"
-      )}
+      style={{
+        display: "inline-flex",
+        alignItems: "center",
+        gap: 5,
+        borderRadius: 999,
+        fontWeight: 500,
+        border: `1px solid ${cfg.borderColor}`,
+        color: cfg.textColor,
+        background: cfg.bgColor,
+        padding: size === "sm" ? "1px 7px" : "3px 10px",
+        fontSize: size === "sm" ? 10 : 11,
+        whiteSpace: "nowrap",
+        lineHeight: 1.4,
+      }}
     >
       {dot && (
         <span
-          className="inline-block rounded-full"
-          style={{ width: 6, height: 6, backgroundColor: cfg.dot }}
+          style={{
+            display: "inline-block",
+            borderRadius: "50%",
+            width: 5,
+            height: 5,
+            backgroundColor: cfg.dotColor,
+            flexShrink: 0,
+          }}
         />
       )}
-      {category}
+      {cfg.label}
     </span>
   );
 }

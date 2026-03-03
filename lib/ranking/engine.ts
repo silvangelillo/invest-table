@@ -9,8 +9,11 @@ const FUNDING_WEIGHTS: Record<string, number> = {
 };
 
 // ─── Ultra boost rules ────────────────────────────────────────────────────────
-const ULTRA_BOOST_PER_MONTH = 0.03;
-const ULTRA_BOOST_CAP        = 1.25; // max 25% increase — never pay-to-win infinite
+// Ultra gets a small longevity lift — commitment is rewarded, but profile
+// quality and investor interest always outweigh tier. Cap at 8% so a
+// strong free startup always beats a weak paid one.
+const ULTRA_BOOST_PER_MONTH = 0.01;  // +1% per month on platform
+const ULTRA_BOOST_CAP        = 1.08; // max +8% — quality-first, not pay-to-win
 
 function getUltraMultiplier(startup: Startup): number {
   if (startup.pricing_tier !== "ultra" || !startup.tier_started_at) return 1.0;

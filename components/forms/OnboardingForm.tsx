@@ -877,23 +877,59 @@ export function OnboardingForm() {
             {/* Tier */}
             <div>
               <label className="dark-label">Listing tier</label>
-              <div className="grid grid-cols-3 gap-3">
-                {([
-                  {t:"core" as StartupPricingTier, name:"Core", price:"Free", desc:"Basic visibility on the map"},
-                  {t:"plus" as StartupPricingTier, name:"Plus", price:"€39/mo", desc:"Alerts + full profile + analytics"},
-                  {t:"ultra" as StartupPricingTier, name:"Ultra", price:"€79/mo", desc:"Ranking boost + featured badge"},
-                ] as const).map(({t, name, price, desc}) => (
-                  <button key={t} type="button" onClick={() => update({pricing_tier: t})}
-                    className="p-4 rounded-2xl text-left transition-all"
-                    style={{
-                      background: data.pricing_tier === t ? 'rgba(59,130,246,0.15)' : 'rgba(255,255,255,0.03)',
-                      border: data.pricing_tier === t ? '1px solid rgba(59,130,246,0.4)' : '1px solid rgba(255,255,255,0.08)',
-                    }}>
-                    <p style={{fontSize:13,fontWeight:500,color:data.pricing_tier===t?'rgba(147,197,253,0.9)':'rgba(255,255,255,0.6)',marginBottom:2}}>{name}</p>
-                    <p style={{fontSize:12,color:data.pricing_tier===t?'rgba(147,197,253,0.7)':'rgba(255,255,255,0.35)',marginBottom:3,fontWeight:500}}>{price}</p>
-                    <p style={{fontSize:11,color:'rgba(255,255,255,0.25)',fontWeight:300}}>{desc}</p>
-                  </button>
-                ))}
+              <div className="flex flex-col gap-3">
+
+                {/* Core */}
+                <button type="button" onClick={() => update({pricing_tier: "core"})}
+                  className="p-4 rounded-2xl text-left transition-all"
+                  style={{
+                    background: data.pricing_tier === "core" ? 'rgba(255,255,255,0.06)' : 'rgba(255,255,255,0.02)',
+                    border: data.pricing_tier === "core" ? '1px solid rgba(255,255,255,0.18)' : '1px solid rgba(255,255,255,0.07)',
+                  }}>
+                  <div style={{display:'flex',alignItems:'center',gap:8,marginBottom:4}}>
+                    <p style={{fontSize:13,fontWeight:600,color:'rgba(255,255,255,0.5)'}}>Core</p>
+                    <span style={{fontSize:10,fontWeight:600,color:'rgba(255,255,255,0.25)',background:'rgba(255,255,255,0.05)',border:'1px solid rgba(255,255,255,0.08)',borderRadius:999,padding:'1px 7px'}}>Free</span>
+                  </div>
+                  <p style={{fontSize:11,color:'rgba(255,255,255,0.22)',fontWeight:300}}>Visible on map · Searchable · Can be saved by investors</p>
+                </button>
+
+                {/* Plus */}
+                <button type="button" onClick={() => update({pricing_tier: "plus"})}
+                  className="p-4 rounded-2xl text-left transition-all"
+                  style={{
+                    background: data.pricing_tier === "plus" ? 'rgba(59,130,246,0.12)' : 'rgba(255,255,255,0.02)',
+                    border: data.pricing_tier === "plus" ? '1px solid rgba(59,130,246,0.35)' : '1px solid rgba(255,255,255,0.07)',
+                  }}>
+                  <div style={{display:'flex',alignItems:'center',gap:8,marginBottom:4}}>
+                    <p style={{fontSize:13,fontWeight:600,color: data.pricing_tier==='plus'?'rgba(147,197,253,0.9)':'rgba(255,255,255,0.5)'}}>Plus</p>
+                    <span style={{fontSize:10,fontWeight:600,color:'rgba(147,197,253,0.8)',background:'rgba(59,130,246,0.12)',border:'1px solid rgba(59,130,246,0.25)',borderRadius:999,padding:'1px 7px'}}>€39 / mo</span>
+                  </div>
+                  <p style={{fontSize:11,color:'rgba(255,255,255,0.3)',fontWeight:300}}>Included in investor deal alerts · Full profile visible · Analytics dashboard</p>
+                </button>
+
+                {/* Ultra — POC offer */}
+                <button type="button" onClick={() => update({pricing_tier: "ultra"})}
+                  className="p-4 rounded-2xl text-left transition-all"
+                  style={{
+                    background: data.pricing_tier === "ultra" ? 'rgba(245,158,11,0.10)' : 'rgba(255,255,255,0.02)',
+                    border: data.pricing_tier === "ultra" ? '1px solid rgba(245,158,11,0.40)' : '1px solid rgba(255,255,255,0.07)',
+                    boxShadow: data.pricing_tier === "ultra" ? '0 0 20px rgba(245,158,11,0.08)' : 'none',
+                  }}>
+                  <div style={{display:'flex',alignItems:'center',gap:8,marginBottom:4,flexWrap:'wrap'}}>
+                    <p style={{fontSize:13,fontWeight:600,color: data.pricing_tier==='ultra'?'rgba(253,211,77,0.95)':'rgba(255,255,255,0.5)'}}>Ultra</p>
+                    <span style={{fontSize:10,fontWeight:700,color:'rgba(253,211,77,0.9)',background:'rgba(245,158,11,0.15)',border:'1px solid rgba(245,158,11,0.35)',borderRadius:999,padding:'1px 8px'}}>
+                      ★ 2 months free
+                    </span>
+                    <span style={{fontSize:10,color:'rgba(255,255,255,0.25)',fontWeight:300}}>then €79/mo</span>
+                  </div>
+                  <p style={{fontSize:11,color:'rgba(255,255,255,0.3)',fontWeight:300,marginBottom:6}}>
+                    Featured badge · Priority in deal alerts · Full analytics · Profile verified seal
+                  </p>
+                  <p style={{fontSize:10,color:'rgba(245,158,11,0.6)',fontWeight:400,fontStyle:'italic'}}>
+                    Proof of Concept offer — experience the full platform, then decide.
+                  </p>
+                </button>
+
               </div>
             </div>
           </div>

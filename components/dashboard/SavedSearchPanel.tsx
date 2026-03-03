@@ -103,7 +103,7 @@ function NewSearchForm({ onSave }: { onSave: (s: SavedSearch) => void }) {
   const [city, setCity] = useState("");
   const [cats, setCats] = useState<StartupCategory[]>([]);
 
-  const allCats: StartupCategory[] = ["Tech", "Food", "Service", "Sustainability"];
+  const allCats: StartupCategory[] = ["Technology", "Finance & FinTech", "Life Sciences & Health", "Climate & Energy", "Mobility & Logistics", "Food & Agriculture", "Deep Tech & Hardware", "Consumer & Media"];
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();

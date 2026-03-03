@@ -154,11 +154,13 @@ export default function LoginPage() {
     const supabase = createClient();
 
     if (tab === "signin") {
-      const { error } = await supabase.auth.signInWithPassword({ email, password });
+      const { data, error } = await supabase.auth.signInWithPassword({ email, password });
       setLoading(false);
       if (error) { toast.error(error.message); return; }
       toast.success("Welcome back!");
-      router.push(role === "investor" ? "/dashboard" : "/onboarding");
+      // Use role from user metadata (set at signup) — fallback to UI selector
+      const metaRole = data.session?.user?.user_metadata?.role ?? role;
+      router.push(metaRole === "startup" ? "/onboarding" : "/dashboard");
     } else {
       const { error } = await supabase.auth.signUp({
         email, password,

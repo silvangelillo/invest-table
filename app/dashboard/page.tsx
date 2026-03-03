@@ -130,10 +130,11 @@ function StartupCard({ startup, rank, favorited, onToggleFav }: {
       display: "flex", alignItems: "flex-start", gap: 16,
       padding: "18px 24px", borderBottom: `1px solid ${BORDER2}`,
       transition: "background 0.15s",
-      cursor: "default",
+      cursor: "pointer", position: "relative",
     }}
       onMouseEnter={e => (e.currentTarget.style.background = "rgba(255,255,255,0.025)")}
       onMouseLeave={e => (e.currentTarget.style.background = "transparent")}
+      onClick={() => window.location.href = `/startup/${startup.id}`}
     >
       {/* Rank */}
       <RankBadge rank={rank} />
@@ -194,7 +195,7 @@ function StartupCard({ startup, rank, favorited, onToggleFav }: {
         {/* Fav button */}
         <button
           type="button"
-          onClick={() => onToggleFav(startup.id)}
+          onClick={(e) => { e.stopPropagation(); onToggleFav(startup.id); }}
           style={{
             width: 32, height: 32, borderRadius: 10,
             background: favorited ? "rgba(239,68,68,0.12)" : "rgba(255,255,255,0.04)",
